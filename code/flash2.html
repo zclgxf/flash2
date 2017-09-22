@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="UTF-8">
+        <title>flash</title>
+        <link rel="stylesheet" href="../css/reset.css">
+        <script src="../js/public.js"></script>
+        <script src="../js/move.js"></script>
+        <style>
+            .box{width:520px; height:280px; margin:0 auto; position: relative;overflow: hidden;}
+            .bigImg{height:280px; position:relative; left:-520px;	}
+            .bigImg li{float:left;width: 520px; }
+            .bigImg li img{width:520px;}
+            /*左右按钮*/
+            .prev, .next{ position: absolute;top:calc(50% - 18px); width:24px; height:36px; 
+                opacity:1; filter:alpha(opacity=100);
+            }
+            .prev{background:rgba(0,0,0,0.3) url('../img/Left.png') no-repeat center;
+                left:0;
+
+            }
+            .next{background:rgba(0,0,0,0.3) url('../img/right.png') no-repeat center;
+                right:0;
+
+            }
+            .box:hover .prev,.box:hover .next{ opacity:1 }
+            .box:hover .prev:hover, .box:hover .next:hover{
+                background-color: rgba(0,0,0,0.6)
+            }
+            #idot{
+                position: absolute; width:66px; left:calc(50% - 25px); bottom:10px;
+                background:rgba(35,35,35,0.2);   border-radius:6px; padding:0 3px;
+            }
+            #idot li{width:9px; height:9px; border-radius:50%; 
+                margin:3px; background: #b7b7b7;
+                float:left; 
+            }
+            #idot .active{background: #ff4400;}
+        </style> 
+    </head>
+    <body>
+        <div class="box" id="wrap">
+            <ul id="flashImg" class="bigImg">
+                <li><img src="../img/4.jpg" alt=""></li>
+                <li><img src="../img/1.jpg" alt=""></li>
+                <li><img src="../img/2.jpg" alt=""></li>
+                <li><img src="../img/3.webp" alt=""></li>
+                <li><img src="../img/4.jpg" alt=""></li>
+                <li><img src="../img/1.jpg" alt=""></li>
+            </ul>	
+            <div id="btn">
+                <span class="prev"></span>
+                <span class="next"></span>
+            </div>
+            <ul id="idot">
+                <li class="active"></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>		
+        </div>
+         <script>
+            window.onload = function(){
+                var oWrap = getTag('wrap');
+                var oUl = getTag('flashImg');
+                var aLi = oUl.children;
+                /*左右按钮*/
+                var oPrev = getTag('btn','span')[0];
+                var oNext = getTag('btn','span')[1];
+                /*下面的点*/
+                var arrIdot = getTag('idot', 'li');
+                var index = 1;
+                var IdotNum = 0;
+                oUl.style.width = aLi[0].offsetWidth*aLi.length + 'px';
+                var bol = true;
+                /*两秒钟切换一次*/
+                var timer = setInterval(next,2000);
+                function tab(){
+                    bol = false;
+                    startMove(oUl, {left:-aLi[0].offsetWidth*index}, function(){
+                        if(index == aLi.length-1){
+                            oUl.style.left = '-520px';
+                            index = 1;
+                        }else if(index == 0){
+                            index = 4;
+                            oUl.style.left = -aLi[0].offsetWidth*index + 'px';
+                        }
+                        bol = true;
+                    });
+
+                    //图片滚动的时候下面的点也要跟着滚动
+                    for(var i=0; i<arrIdot.length; i++){
+                        arrIdot[i].className = '';
+                    }
+                    arrIdot[IdotNum].className = 'active';
+                }
+                /*鼠标的移入移出*/
+                oWrap.onmouseover = function(){
+                    clearInterval(timer);			
+                }
+                oWrap.onmouseout = function(){
+                    timer = setInterval(next,2000);
+                }
+                /*圆点得点击效果*/
+                for(var i=0; i<arrIdot.length; i++){
+                    arrIdot[i].index = i;
+                    arrIdot[i].onclick = function(){
+                        IdotNum = this.index;
+                        index = this.index +1;
+                        tab();
+                    }
+                }
+                /*点击执行下一张*/
+                function next(){    
+                    if(bol){
+                        index++;
+                        IdotNum++;
+                        if(IdotNum == arrIdot.length) IdotNum = 0;
+                        tab();  
+                    }
+                }
+                /*点击左边的按钮*/
+                oPrev.onclick = function(){
+                    if(bol){
+                        index--;
+                        IdotNum--;
+                        if(IdotNum == -1) IdotNum = 3;
+                        tab(); 
+                    }
+                };
+                oNext.onclick = next;
+            }
+        </script>
+    </body>
+</html>
